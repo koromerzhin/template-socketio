@@ -1,0 +1,23 @@
+
+version: "3.4"
+networks:
+  proxynetwork:
+    external: true
+  net:
+    driver: overlay
+    attachable: true
+services:
+  www:
+    image: koromerzhin/nodejs:15.1.0-socketio
+    volumes:
+      - ${PWD}/app:/app
+    networks:
+      - proxynetwork
+      - net
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.socketio.rule=Host(`socketio.traefik.me`)"
+        - "traefik.http.routers.socketio-tls.tls.domains[0].main=socketio.traefik.me"
+        - "traefik.http.routers.socketio-tls.tls.domains[0].sans=socketio-*.traefik.me"
+        - "traefik.http.services.socketio.loadbalancer.server.port=80"
