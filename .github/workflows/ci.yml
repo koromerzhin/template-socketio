@@ -25,12 +25,13 @@ jobs:
         id: app-cache
         uses: actions/cache@v2
         with:
-          path: apps/node_modules
+          path: app/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/app/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-apps
       - name: Install apps npm dependencies
         if: steps.app-cache.outputs.cache-hit != 'true'
+        run: make app/node_modules
       - name: 'Docker swarm init'
         run: docker swarm init --default-addr-pool 10.20.0.0/16
       - name: 'Create proxy network'

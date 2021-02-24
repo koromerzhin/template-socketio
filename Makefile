@@ -24,7 +24,6 @@ app/package-lock.json: app/package.json
 app/node_modules: app/package-lock.json
 	cd app && npm install
 
-
 package-lock.json: package.json
 	@npm install
 
