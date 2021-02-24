@@ -7,7 +7,7 @@ NETWORK       := proxynetwork
 FRONT           := $(STACK)_www
 FRONTFULLNAME   := $(FRONT).1.$$(docker service ps -f 'name=$(FRONT)' $(FRONT) -q --no-trunc | head -n1)
 
-SUPPORTED_COMMANDS := contributors docker logs git linter update inspect ssh
+SUPPORTED_COMMANDS := contributors docker logs git linter update inspect ssh sleep
 SUPPORTS_MAKE_ARGS := $(findstring $(firstword $(MAKECMDGOALS)), $(SUPPORTED_COMMANDS))
 ifneq "$(SUPPORTS_MAKE_ARGS)" ""
   COMMAND_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -51,6 +51,10 @@ else ifeq ($(COMMAND_ARGS),generate)
 else
 	@npm run contributors
 endif
+
+.PHONY: sleep
+sleep: ## sleep
+	@sleep  $(COMMAND_ARGS)
 
 docker: isdocker ## Scripts docker
 ifeq ($(COMMAND_ARGS),create-network)
