@@ -7,6 +7,14 @@ networks:
     driver: overlay
     attachable: true
 services:
+  exec:
+    image: koromerzhin/nodejs:15.1.0-socketio
+    volumes:
+      - ${PWD}/app:/app
+    command: sh -c "npm install"
+    deploy:
+      labels:
+        - "traefik.enable=false"
   www:
     image: koromerzhin/nodejs:15.1.0-socketio
     volumes:
