@@ -13,6 +13,8 @@ services:
       - ${PWD}/app:/app
     command: sh -c "npm install"
     deploy:
+      restart_policy:
+        condition: none
       labels:
         - "traefik.enable=false"
   www:
