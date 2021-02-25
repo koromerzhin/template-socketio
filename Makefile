@@ -4,8 +4,9 @@ isDocker := $(shell docker info > /dev/null 2>&1 && echo 1)
 STACK         := socketio
 NETWORK       := proxynetwork
 
-FRONT           := $(STACK)_www
-FRONTFULLNAME   := $(FRONT).1.$$(docker service ps -f 'name=$(FRONT)' $(FRONT) -q --no-trunc | head -n1)
+WWW         := $(STACK)_www
+WWWFULLNAME := $(WWW).1.$$(docker service ps -f 'name=$(WWW)' $(WWW) -q --no-trunc | head -n1)
+WWWRUN      := docker run --rm -v ${PWD}/front:/app koromerzhin/nodejs:15.1.0-socketio
 
 SUPPORTED_COMMANDS := contributors docker logs git linter update inspect ssh sleep
 SUPPORTS_MAKE_ARGS := $(findstring $(firstword $(MAKECMDGOALS)), $(SUPPORTED_COMMANDS))
@@ -17,15 +18,8 @@ endif
 help:
 	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
 
-
-app/package-lock.json: app/package.json
-	cd app && npm install
-
-app/node_modules: app/package-lock.json
-	cd app && npm install
-
-package-lock.json: package.json
-	@npm install
+app/node_modules:
+	$(WWWRUN) npm install
 
 .PHONY: isdocker
 isdocker: ## Docker is launch
@@ -34,7 +28,7 @@ ifeq ($(isDocker), 0)
 	exit 1
 endif
 
-node_modules: package-lock.json
+node_modules:
 	@npm install
 
 build: ## build
@@ -81,15 +75,15 @@ endif
 logs: isdocker ## Scripts logs
 ifeq ($(COMMAND_ARGS),stack)
 	@docker service logs -f --tail 100 --raw $(STACK)
-else ifeq ($(COMMAND_ARGS),front)
-	@docker service logs -f --tail 100 --raw $(FRONTFULLNAME)
+else ifeq ($(COMMAND_ARGS),www)
+	@docker service logs -f --tail 100 --raw $(WWWFULLNAME)
 else
 	@echo "ARGUMENT missing"
 	@echo "---"
 	@echo "make logs ARGUMENT"
 	@echo "---"
 	@echo "stack: logs stack"
-	@echo "front: FRONT"
+	@echo "www: WWW"
 endif
 
 git: node_modules ## Scripts GIT
@@ -126,34 +120,34 @@ else
 endif
 
 ssh: isdocker ## ssh
-ifeq ($(COMMAND_ARGS),front)
-	@docker exec -it $(FRONTFULLNAME) /bin/bash
+ifeq ($(COMMAND_ARGS),www)
+	@docker exec -it $(WWWFULLNAME) /bin/bash
 else
 	@echo "ARGUMENT missing"
 	@echo "---"
 	@echo "make ssh ARGUMENT"
 	@echo "---"
-	@echo "front: FRONT"
+	@echo "www: WWW"
 endif
 
 inspect: isdocker ## inspect
-ifeq ($(COMMAND_ARGS),front)
-	@docker service inspect $(FRONT)
+ifeq ($(COMMAND_ARGS),www)
+	@docker service inspect $(WWW)
 else
 	@echo "ARGUMENT missing"
 	@echo "---"
 	@echo "make inspect ARGUMENT"
 	@echo "---"
-	@echo "front: FRONT"
+	@echo "www: WWW"
 endif
 
 update: isdocker ## ssh
-ifeq ($(COMMAND_ARGS),front)
-	@docker service update $(FRONT)
+ifeq ($(COMMAND_ARGS),www)
+	@docker service update $(WWW)
 else
 	@echo "ARGUMENT missing"
 	@echo "---"
 	@echo "make update ARGUMENT"
 	@echo "---"
-	@echo "front: FRONT"
+	@echo "www: WWW"
 endif
