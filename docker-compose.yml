@@ -8,7 +8,7 @@ networks:
     attachable: true
 services:
   exec:
-    image: koromerzhin/nodejs:15.1.0-socketio
+    image: koromerzhin/nodejs:15.1.0
     volumes:
       - ${PWD}/app:/app
     command: sh -c "npm install"
@@ -18,7 +18,7 @@ services:
       labels:
         - "traefik.enable=false"
   www:
-    image: koromerzhin/nodejs:15.1.0-socketio
+    image: koromerzhin/nodejs:15.1.0
     volumes:
       - ${PWD}/app:/app
     networks:
