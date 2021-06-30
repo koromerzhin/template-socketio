@@ -27,7 +27,7 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.socketio.rule=Host(`socketio.traefik.me`)"
+        - "traefik.http.routers.socketio.rule=HostRegexp(`socketio.traefik.me`, `socketio.{ip:.*}.traefik.me`)"
         - "traefik.http.routers.socketio-tls.tls.domains[0].main=socketio.traefik.me"
         - "traefik.http.routers.socketio-tls.tls.domains[0].sans=socketio-*.traefik.me"
         - "traefik.http.services.socketio.loadbalancer.server.port=80"
